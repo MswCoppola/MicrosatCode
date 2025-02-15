@@ -1,21 +1,24 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import math
 
-
-def canny_edge_detector(img, can1, can2): #can1,  can2 are the hysteria thresholds
+def canny_edge_detector(img, can1, can2, double =False): #can1,  can2 are the hysteria thresholds
+    im_gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_canny = cv2.Canny(img, can1, can2, np.array(img.shape), 7)   # creating the canny edge image for processing
     kernel = np.ones((3, 3))                                         # defining kernel for dilation and erosion
     img_dilate = cv2.dilate(img_canny, kernel, iterations=1)
-    corners = cv2.cornerHarris(img_canny,14,7,0.04)
+    corners = cv2.cornerHarris(im_gr,3,3,0.2)
 
-    b = np.argwhere(corners >= 0.5 * corners.max())  # finding the maximum corners
+    b = np.argwhere(corners >= 0.5 * corners.max())  # finding the maximum corners (doesn't fully work, only in specific situations)
 
     """ Debuging images"""
-    #plt.plot(), plt.imshow(img), plt.title('image for mapping')
-    #plt.show()
-    #plt.plot(), plt.imshow(corners), plt.title('corner weights')
-    #plt.show()
+    # plt.plot(), plt.imshow(img), plt.title('image for mapping')
+    # plt.show()
+    plt.plot(), plt.imshow(img_canny), plt.title(f'canny image for double is {double}')
+    plt.show()
+    # plt.plot(), plt.imshow(corners), plt.title('corner weights')
+    # plt.show()
 
     """ Debugging for large corners"""
     #print(f"b = {b}")
@@ -24,7 +27,7 @@ def canny_edge_detector(img, can1, can2): #can1,  can2 are the hysteria threshol
     #print(f"corner shape = {corners.shape}")
     #print(f"max corner = {corners[b[:,::-1]]}")
 
-    inverted_mask = cv2.bitwise_not(img_canny)
+    inverted_mask = cv2.bitwise_not(img_dilate)     # Invert the edge intensity to accomodate removal of edges from the image in later stage
     return inverted_mask
 
 def background_remover(img, rect):                # Provide a rectangle section for possible sat position and define used backremover method
@@ -49,94 +52,94 @@ def background_remover(img, rect):                # Provide a rectangle section 
 
     return mask2, img_new
 
-def Corner_and_edge_outliner(imcol, aprx = True):
+def Corner_and_edge_outliner(imcol, aprx = True):   # aprx=True determines if it approximates the contour by the best points (corners) or if it just finds all contour defining points
 
     #convert image to gray image
-    imgray = cv2.cvtColor(imcol, cv2.COLOR_BGR2GRAY)//2
+    imgray = cv2.cvtColor(imcol, cv2.COLOR_BGR2GRAY)
     kernel = np.ones((3, 3))
-    img_erode = cv2.erode(imgray, kernel, iterations=2)             #TODO determine if errosion is necessary for face splitting
+    img_erode = cv2.erode(imgray, kernel, iterations=1)             #TODO determine if errosion is necessary for face splitting (right now it seems like not)
 
     #threshold the image and draw the contours
     ret, thresh = cv2.threshold(imgray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     contoured = imgray
-
+    all_corners =[]
     #save the largest contours (size by area)
     cnts = []
     approximations = []
     for cnt in contours:
-        perimeter = cv2.arcLength(cnt, True)
-        per = 0.02*perimeter
-        approx = cv2.approxPolyDP(cnt, per, True)
-        print(f"current values for approx = {approx}")
-        approximations.append(approx)
         area = cv2.contourArea(cnt)
-        # method if aprx is set as true, aprx defines if edges are to be interpolated or directly measured
-        if aprx is True:
-            for point in approx:
-                x, y = point[0]
-                cv2.circle(contoured, (x, y), 5, (255, 255, 255), -1)
+        if area >= 100:
+            # method if aprx is set as true, aprx defines if edges are to be interpolated or directly measured
+            if aprx is True:
+                perimeter = cv2.arcLength(cnt, True)
+                it = 10
+                per = 0.02 * perimeter
+                approx = cv2.approxPolyDP(cnt, per, True)
+                arr = approx.reshape(-1, approx.shape[-1])
+                print(f"current values for approx = {arr}")
 
-            # drawing skewed rectangle
-            cv2.drawContours(contoured, [approx], -1, (255, 255, 255))
-        if area >= 200:
-            cnts.append(cnt)
+                # The following code can be used if more than 4 points are found for a face to try and limit the points to 4
+                """while len(approx) > 4 and it!=0:
+                    print(f"current iteration = {it} and current #pnts = {len(approx)}")
+                    per = 1.1*per
+                    approx = cv2.approxPolyDP(cnt, per, True)
+                    it -= 1"""
+                for point in approx:
+                    x, y = point[0]
+                    all_corners.append(point[0])
+                    approximations.append(arr)
+                    cv2.circle(contoured, (x, y), 5, (255, 255, 255), -1)
+            else:
+                cnts.append(cnt)
+            # drawing The contour
+                cv2.drawContours(contoured, [approx], -1, (255, 255, 255))
 
     """ Debugging images area"""
     #plt.plot(), plt.imshow(contoured), plt.title(f'Imgray after approx')
     #plt.show()
-    #plt.plot(), plt.imshow(thresh, cmap="gray"), plt.title('Threshold')
-    #plt.show()
+    plt.plot(), plt.imshow(imcol, cmap="gray"), plt.title('Threshold')
+    plt.show()
     #plt.plot(), plt.imshow(imgray, cmap="gray"), plt.title('Imgray before contour')
     #plt.show()
-
     if aprx is False:
-        for i in range(0, len(cnts)):
-            c = cnts[i]
-            #determine and draw the largest contour
-            #contrs = max(contours, key=cv2.contourArea)
+        return contoured, cnts
+    return contoured, approximations, all_corners
 
-            contoured = cv2.drawContours(imgray, c, -1, (255,255,255), 2)
-            plt.plot(), plt.imshow(contoured), plt.title(f'Imgray after contour {i}')
-            plt.show()
+def filter_close_points(points, threshold):
+    """
+    Filters a list of points (x, y) and averages points closer than the threshold.
 
-            #determine all edge points based on contour extremes
-            leftmost = tuple(c[c[:, :, 0].argmin()][0])
-            rightmost = tuple(c[c[:, :, 0].argmax()][0])
-            topmost = tuple(c[c[:, :, 1].argmin()][0])
-            bottommost = tuple(c[c[:, :, 1].argmax()][0])
+    Args:
+      points: A list of tuples representing points (x, y).
+      threshold: The maximum distance between points to be averaged.
 
-            # alternative points determination
-            # TODO find most effective method
-            pa = np.where(c[:, 0, 1] == c[:, 0, 1].min())[0]
-            pa_ = np.where(c[pa, 0] == c[pa,0][:, 0].max())[0][0]
-            pap = c[pa,0][pa_]
-            pb = np.where(c[:, 0, 1] == c[:, 0, 1].max())[0]
-            pb_ = np.where(c[pb, 0] == c[pb, 0][:, 0].min())[0][0]
-            pbp = c[pb, 0][pb_]
-            pc = np.where(c[:, 0, 0] == c[:, 0, 0].min())[0]
-            pc_ = np.where(c[pc, 0] == c[pc, 0][:, 1].max())[0][0]
-            pcp = c[pc, 0][pc_]
-            pd = np.where(c[:, 0, 0] == c[:, 0, 0].max())[0]
-            pd_ = np.where(c[pd, 0] == c[pd, 0][:, 1].min())[0][0]
-            pdp = c[pd,0][pd_]
-            print("yes it is working") #Debugging
-
-            pnts = np.array([pap, pbp, pcp, pdp])
-            #pnts = np.array([leftmost, rightmost, topmost, bottommost])
-
-            #print(f"points for corners are {pnts}") #Debugging
-            for i in range(0, len(pnts)):
-                cv2.circle(contoured,pnts[i], 10, (255,255,255), -1)
-
-    """ Debugging image area"""
-    #plt.plot(), plt.imshow(contoured, cmap="gray"), plt.title('Final with corners')
-    #plt.show()
-
-    if aprx is True:
-        return contoured, approximations
-    return contoured, pnts
+    Returns:
+      A new list containing the averaged points.
+    """
+    filtered_points = []
+    i = 0
+    while i < len(points):
+        # Initialize a list to store points to be averaged
+        average_group = [points[i]]
+        j = i + 1
+        while j < len(points):
+            x1, y1 = points[i]
+            x2, y2 = points[j]
+            distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+            if distance < threshold:
+                average_group.append(points[j])
+                # Remove the point from the original list to avoid duplicates
+                del points[j]
+            else:
+                j += 1
+        # Calculate the average of the points in the group
+        x_avg = int(sum([x for x, _ in average_group]) / len(average_group))
+        y_avg = int(sum([y for _, y in average_group]) / len(average_group))
+        filtered_points.append((x_avg, y_avg))
+        i += 1
+    return filtered_points
 
 def face_grouping_detection(imcol, pnts):
     return  # output should be a dictionary containing the face as key and corresponding points as output
