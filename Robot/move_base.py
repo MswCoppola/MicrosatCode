@@ -24,10 +24,10 @@ def move_base():
         goal = MoveGoal()
 
         if step == 1:
-            # SET YOUR DESIRED GOAL POSITION HERE (Step 1) (Only 1 goal can be given at a time)
+            # SET YOUR DESIRED GOAL POSITION HERE (Step 1)
             goal.goal.x = 0.0  # Move forward/backward (+/- X direction)
             goal.goal.y = -0.5  # Move left/right (+/- Y direction)
-            goal.goal.theta = 0.0  # Rotation in radians (negative --> clockwise)
+            goal.goal.theta = 0  # Rotation in radians (negative --> clockwise)
 
             # Set the robot's maximum velocity for smoother motion
             goal.maximum_velocity.linear.x = goal.goal.x / manuver_time

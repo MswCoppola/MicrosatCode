@@ -41,7 +41,7 @@ def main():
 
     # Create a single trajectory point
     point = JointTrajectoryPoint()
-    point.positions = [1.4502070585833948, -1.8772961101927699, 0.02, -0.3, 0.22516180574893951, -1.7] # Relative positions
+    point.positions = [1.3205655256854456, -1.6834951839842738, 0.14838001132011414, 0.1, 0.10094499588012695, -2.364384476338522]
     point.velocities = [0.0] * 6
     point.time_from_start = rospy.Duration(7.0)
 
