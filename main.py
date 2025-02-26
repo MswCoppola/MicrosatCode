@@ -39,7 +39,7 @@ if __name__ == "__main__":
     while it < len(imlst) and rot_det is False:
         try:
             imcol = cv2.imread(imlst[it])
-            image_resized = cv2.resize(imcol, (900, 500))  # Resize the image to constant and processable dimensions
+            image_resized = cv2.resize(imcol, (900, 625))  # Resize the image to constant and processable dimensions
         except:
             print(f"Unable to read image number {it}")
         it += 1

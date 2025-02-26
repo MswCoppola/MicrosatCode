@@ -39,14 +39,13 @@ class Satellite:
             masked_img = cv2.bitwise_and(edge_col, edge_col, mask=mask)     # Subtracts the edges from the image to create clearly separated faces
             pic = dp.Corner_and_edge_outliner(masked_img, True)     # Determines and outlines the corners
 
-            grpd_corn = dp.filter_close_points(pic[2], 10)      # Input=(array of points, max pixel distance to average 2 or more points)
+
+            grpd_corn = dp.filter_close_points(pic[2], 15)      # Input=(array of points, max pixel distance to average 2 or more points)
             extr = mask.copy()
             extr_img = img.copy()
 
             for i in grpd_corn:         # Circles the corners in the image (visual assistance only)
                 cv2.circle(extr_img, i, 4, (255, 255, 255), -1)
-            plt.plot(), plt.imshow(extr_img), plt.title('Debugging image mask')
-            plt.show()
         except:
             print("Was not able to process the image")
             return

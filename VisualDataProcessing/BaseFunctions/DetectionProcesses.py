@@ -29,7 +29,10 @@ def background_remover(img, rect):                # Provide a rectangle section 
     fgdModel = np.zeros((1, 65), np.float64)
 
     # Apply grabcut alghorithm to remove background
-    cv2.grabCut(img,mask,rect,bgdModel,fgdModel, 7,cv2.GC_INIT_WITH_RECT)
+    #cv2.grabCut(img,mask,rect,bgdModel,fgdModel, 7,cv2.GC_INIT_WITH_RECT)
+    ret, thresh = cv2.threshold(imgray, 5, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    imguse = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+    cv2.grabCut(imguse, mask, rect, bgdModel, fgdModel, 7, cv2.GC_INIT_WITH_RECT)
 
     # Create mask and image with removed background
     mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
@@ -50,7 +53,7 @@ def Corner_and_edge_outliner(imcol, aprx = True):   # aprx=True determines if it
     ret, thresh = cv2.threshold(imgray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-    contoured = imgray
+    contoured = imcol
     all_corners =[]
     #save the largest contours (size by area)
     cnts = []
@@ -78,6 +81,7 @@ def Corner_and_edge_outliner(imcol, aprx = True):   # aprx=True determines if it
                     all_corners.append(point[0])
                     approximations.append(arr)
                     cv2.circle(contoured, (x, y), 5, (255, 255, 255), -1)
+                cv2.drawContours(contoured, [approx], -1, (255, 255, 255))
             else:
                 cnts.append(cnt)
             # drawing The contour
