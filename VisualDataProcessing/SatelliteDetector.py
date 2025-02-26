@@ -1,7 +1,5 @@
 import cv2
-import numpy as np
-from VisualDataProcessing import DetectionProcesses as dp
-from VisualDataProcessing.BaseFunctions import Locator as il
+from VisualDataProcessing.BaseFunctions import Locator as il, DetectionProcesses as dp
 from matplotlib import pyplot as plt
 
 
@@ -21,10 +19,12 @@ class Satellite:
         return
 
     def face_saving(self, unkown):   # ####################################### Gregs code for determining faces
-        return
+        valid_quads = dp.generate_quadrilaterals(unkown)
+        cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, unkown)
+        return cuboid_candidates
 
     def loc_on_screen(self, imcol, wind_sens= 0.05):  # uses a colour input image and block size for binning
-        block = (imcol.shape[1] // 10, imcol.shape[0] // 10)  # Bin size for binning
+        block = (imcol.shape[1] // 15, imcol.shape[0] // 15)  # Bin size for binning
         (xp, yp), (rel_x, rel_y), window = il.loc_on_screen(imcol, block, wind_sens)
         self.screen_pos = (rel_x, rel_y)
         return (rel_x, rel_y), window       # Outputs relative position of target on screen and the window which contains that target
@@ -41,20 +41,17 @@ class Satellite:
 
             grpd_corn = dp.filter_close_points(pic[2], 10)      # Input=(array of points, max pixel distance to average 2 or more points)
             extr = mask.copy()
+            extr_img = img.copy()
 
             for i in grpd_corn:         # Circles the corners in the image (visual assistance only)
-                cv2.circle(extr, i, 4, (100, 100, 100), -1)
-
-
-            plt.plot(), plt.imshow(extr, cmap="gray"), plt.title('Final cornered image')
-            plt.show()
-            plt.plot(), plt.imshow(image_processed), plt.title('Debugging image mask')
+                cv2.circle(extr_img, i, 4, (255, 255, 255), -1)
+            plt.plot(), plt.imshow(extr_img), plt.title('Debugging image mask')
             plt.show()
         except:
             print("Was not able to process the image")
             return
 
-        return pic      # Adjust this return to return the necessary outputs from each function
+        return grpd_corn      # Adjust this return to return the necessary outputs from each function
 
     def __str__(self):      # If you use print(satellite) this will be the printed statement
         print(f"Size of the satellite is {self.width}'W',{self.depth}'D'{self.heigth}'H' ")
