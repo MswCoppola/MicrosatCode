@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from shapely.geometry import Polygon
 import numpy as np
-from Geometric_Three_Points import generate_quadrilaterals, corner_points
+from Geometric_Three_Points import corner_points
 from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
 import os
 
 # Suppress threading warnings
@@ -15,26 +17,6 @@ FOCAL_LENGTH_CM = 0.5   # Camera focal length in cm
 REAL_SHORT_CM = 3       # Real short edge length in cm
 REAL_LONG_CM = 9        # Real long edge length in cm
 EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM  # Expected aspect ratio = 3.0
-
-def compute_face_area(face):
-    """Compute the area of a quadrilateral face."""
-    return Polygon(face).area
-
-def compute_aspect_ratio(face):
-    """Compute the aspect ratio of a quadrilateral face based on side lengths."""
-    side_lengths = []
-    for i in range(len(face)):
-        p1 = np.array(face[i])
-        p2 = np.array(face[(i + 1) % len(face)])
-        side_length = np.linalg.norm(p2 - p1)
-        side_lengths.append(side_length)
-
-    if not side_lengths:
-        return float('inf')
-
-    side_lengths.sort()
-    aspect_ratio = side_lengths[-1] / side_lengths[0] if side_lengths[0] != 0 else float('inf')
-    return aspect_ratio
 
 def calculate_center_of_mass(corner_points):
     """Calculate the center of mass of the cuboid in meters."""
@@ -59,28 +41,44 @@ def compute_camera_vector(center_of_mass, distance):
     camera_vector = np.array([x, y, z])
     return camera_vector
 
-def extract_faces_from_saved_plot(saved_final_two_face_cuboid):
-    """Extract faces from the saved final two-face cuboid plot."""
-    faces = []
-    for ax in saved_final_two_face_cuboid.axes:
-        for line in ax.get_lines():
-            x_data = line.get_xdata()
-            y_data = line.get_ydata()
-            if len(x_data) >= 4:
-                face = list(zip(x_data[:-1], y_data[:-1]))
-                if len(face) == 4:
-                    faces.append(face)
-    return faces
+def plot_3d_camera_position(camera_vector, center_of_mass):
+    """Plot the camera position relative to the cuboid center of mass in 3D (meters) with vector annotation."""
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot points
+    ax.scatter([center_of_mass[0]], [center_of_mass[1]], [0], c='blue', label='Cuboid Center of Mass')
+    ax.scatter([camera_vector[0]], [camera_vector[1]], [camera_vector[2]], c='red', label='Camera Position')
+
+    # Plot vector
+    ax.plot([center_of_mass[0], camera_vector[0]],
+            [center_of_mass[1], camera_vector[1]],
+            [0, camera_vector[2]],
+            c='green', linestyle='--', label=f'Vector to Camera: {camera_vector}')
+
+    # Annotations
+    ax.text(camera_vector[0], camera_vector[1], camera_vector[2],
+            f"Camera\n({camera_vector[0]:.2e}, {camera_vector[1]:.2e}, {camera_vector[2]:.2f} m)",
+            color='red')
+    ax.text(center_of_mass[0], center_of_mass[1], 0,
+            f"Center\n({center_of_mass[0]:.2e}, {center_of_mass[1]:.2e}, 0 m)",
+            color='blue')
+
+    ax.set_xlabel('X (meters)')
+    ax.set_ylabel('Y (meters)')
+    ax.set_zlabel('Z (meters)')
+    ax.legend()
+    plt.title('Camera Position and Vector Relative to Cuboid Center of Mass (Meters)')
+    plt.show()
 
 def main():
-    """Estimate camera position vector from cuboid center of mass with X, Y in meters."""
-    if saved_final_two_face_cuboid:
-        extracted_faces = extract_faces_from_saved_plot(saved_final_two_face_cuboid)
+    """Estimate camera position vector and plot it in 3D using pre-identified faces."""
+    if saved_final_two_face_cuboid and classified_faces:
         center_of_mass = calculate_center_of_mass(corner_points)
         print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
 
         edges = []
-        for face in extracted_faces:
+        for face_label, face in classified_faces.items():
             for i in range(len(face)):
                 p1, p2 = np.array(face[i]), np.array(face[(i + 1) % len(face)])
                 edge_length = np.linalg.norm(p2 - p1) * PIXEL_SIZE_CM
@@ -96,10 +94,11 @@ def main():
             print(f"✅ Estimated camera distance (Z-axis in meters): {distance:.5f} meters")
             camera_vector = compute_camera_vector(center_of_mass, distance)
             print(f"🎯 Camera position vector (X, Y, Z in meters): {camera_vector}")
+            plot_3d_camera_position(camera_vector, center_of_mass)
         else:
             print("❌ Distance estimation failed.")
     else:
-        print("❌ No saved two-face cuboid plot available to process.")
+        print("❌ Required data not available: Either no saved cuboid plot or face identification missing.")
 
 if __name__ == "__main__":
     main()
