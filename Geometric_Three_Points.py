@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 from itertools import combinations
 import math
+import subprocess
 
 def sort_clockwise(points):
     """Sort points in clockwise order around the centroid."""
@@ -61,8 +62,8 @@ def plot_quadrilaterals(valid_quads, corner_points):
         #plt.show()
 
 # Example corner points
-#corner_points = [(0,0), (2.123,2.123), (1.5089479078638484,2.7336927792554375), (-0.6123724356957946,0.6123724356957946), (0.000000,-0.500000), (2.121320,1.623), (-0.6123724356957946,0.112372)]
-corner_points = [(0, 0), (3, 0), (0.333, -1),(2.6666, -1),(0.333, 3),( 2.6666, 3)]
+corner_points = [(0,0), (2.123,2.123), (1.5089479078638484,2.7336927792554375), (-0.6123724356957946,0.6123724356957946), (0.000000,-0.500000), (2.121320,1.623), (-0.6123724356957946,0.112372)]
+#corner_points = [(0, 0), (1.5, 0), (0.333, -0.5),(1.11111, -0.5),(0.333, 3),(1.1111, 3)]
 
 
 # Generate and plot quadrilaterals
@@ -72,3 +73,4 @@ if valid_quads:
     #plot_quadrilaterals(valid_quads, corner_points)
 else:
     print("No valid quadrilaterals were found.")
+

@@ -73,7 +73,7 @@ print(f"✅ Generated {len(valid_quads)} valid quadrilaterals from Geometric_Thr
 
 # Identify cuboid candidates
 cuboid_candidates = identify_cuboids_from_faces(valid_quads, all_corners)
-print(f"✅ Identified {len(cuboid_candidates)} possible cuboids.")
+print(f"✅ Identified {len(cuboid_candidates)} possible cuboids from Cuboid_Detection.")
 
 # Plot the identified cuboid candidates
 if cuboid_candidates:
