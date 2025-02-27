@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from VisualDataProcessing.BaseFunctions import Locator as il, DetectionProcesses as dp
 from matplotlib import pyplot as plt
 
@@ -15,7 +16,28 @@ class Satellite:
     def image_extractor(self, unkown):  # ####################################### Can be used to take a snapshot
         return
 
-    def corner_grouper(self, unkown):   # ####################################### Can be used to link corners across multiple image
+    def rotation_axis_determination(self, all_corners):   # ####################################### Can be used to link corners across multiple image
+        matched_corner_lists = dp.match_vertices_series(all_corners)
+        print(matched_corner_lists[0])
+        for i in range(0, len(matched_corner_lists[0])):
+
+            self.corner_lib[f"corner_{i}"] = matched_corner_lists[0][i]
+            plottable_array = np.array(matched_corner_lists[0][i])
+            x, y = plottable_array.T
+            xm, ym = np.mean(x), np.mean(y)
+            std_x = np.std(x)
+            std_y = np.std(y)
+            for j in range(0, len(matched_corner_lists[0][i])-1):
+                xj, yj = matched_corner_lists[0][i][j]
+                if abs(xj - xm) >= 2*std_x or abs(yj - ym) >= 2*std_y:
+                    del matched_corner_lists[0][i][j]
+            plottable_array = np.array(matched_corner_lists[0][i])
+            x, y = plottable_array.T
+            plt.scatter(x, y)
+            plt.scatter(xm, ym)
+            plt.show()
+        rot_ax = dp.analyze_and_plot_ellipses(matched_corner_lists[0])
+        self.rot_ax = rot_ax[0]
         return
 
     def face_saving(self, unkown):   # ####################################### Gregs code for determining faces
@@ -49,7 +71,6 @@ class Satellite:
         except:
             print("Was not able to process the image")
             return
-
         return grpd_corn      # Adjust this return to return the necessary outputs from each function
 
     def __str__(self):      # If you use print(satellite) this will be the printed statement

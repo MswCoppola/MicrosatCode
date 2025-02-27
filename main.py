@@ -22,6 +22,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from VisualDataProcessing import SatelliteDetector as SD
+#from Robot import take_picture as tp
 import os
 
 
@@ -34,6 +35,7 @@ if __name__ == "__main__":
     """Test code for reading images"""
     imlst = []
     all_point_dic = {}
+    all_point_lst = []
     for img in os.listdir(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics"):
         imlst.append(os.path.join(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics",img))
     while it < len(imlst) and rot_det is False:
@@ -46,10 +48,13 @@ if __name__ == "__main__":
         try:
             rel_cam_pos, rect = current_satellite.loc_on_screen(image_resized,0.10)  # Input(Resized colour image, fraction of maximum intensity which is considered !not background!)
             process = current_satellite.current_corners(image_resized, kernel, rect)  # Runs the entire corner detection, grouping etc, the output can be defined in the SatelliteDetector.py file
-            all_point_dic[f"img_{it}"] = process
+            all_point_dic[f"img_{it}_corners"] = process
+            all_point_lst.append(np.array(process))
         except:
             print("Unable to determine corners")
-    print(all_point_dic)
+    print(all_point_lst)
+    current_satellite.rotation_axis_determination(all_point_lst)
+    print(current_satellite.corner_lib)
     #----------Ruan code, use process output as input---------------
 
     #imcol = cv2.imread(r"C:\Users\massi\Downloads\TryImage_block_blackEdge.jpeg")

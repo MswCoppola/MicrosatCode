@@ -4,7 +4,6 @@ import cv2
 
 def loc_on_screen(imcol, block, wind_sens):  # uses a colour input image, block size for binning and a intensity sensitivity for windowing
     y, x, z = imcol.shape
-    print(y,x,z)
     amt_x = x // block[0]  # define blocks for binning image intensities
     amt_y = y // block[1]
     int_img = np.zeros((y, x))
@@ -26,7 +25,7 @@ def loc_on_screen(imcol, block, wind_sens):  # uses a colour input image, block 
     x_len = np.max(int_med[1]) - np.min(int_med[1]) + 1     # Window size calculation
     y_len = np.max(int_med[0]) - np.min(int_med[0]) + 1
     window = (np.min(int_med[1]), np.min(int_med[0]), x_len, y_len)  # window for the background removal process
-    print(f"window is {window}")
+    # print(f"window is {window}")
     return (xp, yp), (rel_x, rel_y), window     # Output= (absolute target center on image, target center relative to image center, window which is considered not background)
 
 def exact_center(imcol): # Input should be a masked image of the satellite without background
