@@ -96,6 +96,7 @@ def main():
  
     # Step 3: Run `take_picture.py` for 5 seconds
     capture_images(duration=5)
+    
  
     input("🔹 Press Enter to move the base forward...")
  
