@@ -44,15 +44,15 @@ class Satellite:
         valid_quads = dp.generate_quadrilaterals(pntl)
         if len(pntl) == 7:
             cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, pntl)
-            distance = dp.Camera_Distance_Estimation(pntl)
-            return distance
+            Distance = dp.Camera_Distance_Estimation(pntl)
+            return Distance
         elif len(pntl) == 6:
             desired_comb = dp.plot_shared_edge_combination(valid_quads)
-            coboid_candidates = dp.fileter_final_combination(desired_comb)
-            pass
+            coboid_candidates = dp.filter_final_combination(desired_comb)
+            Distance = dp.Camera_distance_estimation_two(pntl, cuboid_candidates)
+            return Distance
         else:
             return None
-        return cuboid_candidates
 
     def loc_on_screen(self, imcol, wind_sens= 0.05):  # uses a colour input image and block size for binning
         block = (imcol.shape[1] // 15, imcol.shape[0] // 15)  # Bin size for binning
