@@ -780,10 +780,10 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
     plt.title('Camera Position and Vector Relative to Cuboid Center of Mass (Meters)')
     plt.show()
 
-def Camera_Distance_Estimation_Two():
+def Camera_Distance_Estimation_Two(corn_list):
     """Estimate camera position vector and plot it in 3D using pre-identified faces."""
     if saved_final_two_face_cuboid and classified_faces:
-        center_of_mass = calculate_center_of_mass(corner_points)
+        center_of_mass = calculate_center_of_mass(corn_list)
         print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
 
         edges = []
