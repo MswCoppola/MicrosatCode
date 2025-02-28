@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-from VisualDataProcessing.BaseFunctions import Locator as il, DetectionProcesses as dp
+from VisualDataProcessing.BaseFunctions import Locator as il
+from VisualDataProcessing import DetectionProcesses as dp
 from matplotlib import pyplot as plt
 from VisualDataProcessing import Corner_Grouping as CornerGrouping
 from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
