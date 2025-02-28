@@ -87,11 +87,12 @@ class Satellite:
         return "Current satellite parameters returned"
 
 #Geometric_Three_Points----------
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon
-#from itertools import combinations
-#import math
-#import subprocess
+
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
+from itertools import combinations
+import math
+import subprocess
 
 # Example corner points------------------
 #corner_points = [(0,0), (2.123,2.123), (1.5089479078638484,2.7336927792554375), (-0.6123724356957946,0.6123724356957946), (0.000000,-0.500000), (2.121320,1.623), (-0.6123724356957946,0.112372)]
@@ -108,10 +109,10 @@ else:
 
 #Cuboid_Detection-----------------------
 
-#import matplotlib.pyplot as plt
-#from itertools import combinations
-#from shapely.geometry import Polygon, Point, LineString
-#from Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
+import matplotlib.pyplot as plt
+from itertools import combinations
+from shapely.geometry import Polygon, Point, LineString
+from Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
 
 
 # Use the quadrilaterals from Geometric_Three_Points
@@ -130,10 +131,10 @@ else:
 
 #Face_Determination-----------------------
 
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon
-#import numpy as np
-#from Cuboid_Detection import cuboid_candidates  # Import detected cuboid candidates
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
+import numpy as np
+from Cuboid_Detection import cuboid_candidates  # Import detected cuboid candidates
 
 
 if cuboid_candidates:
@@ -148,12 +149,12 @@ else:
 
 #Camera_Distance_Estimation------------------
 
-#import numpy as np
-#from shapely.geometry import LineString
-#from Geometric_Three_Points import corner_points
-#from Cuboid_Detection import cuboid_candidates
-#import matplotlib.pyplot as plt
-#import os
+import numpy as np
+from shapely.geometry import LineString
+from Geometric_Three_Points import corner_points
+from Cuboid_Detection import cuboid_candidates
+import matplotlib.pyplot as plt
+import os
 
 
 if __name__ == "__main__":
@@ -161,11 +162,11 @@ if __name__ == "__main__":
 
 #Cuboid_Detection_Two-----------------------
 
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon, LineString, Point
-#from itertools import combinations
-#from Geometric_Three_Points import generate_quadrilaterals, corner_points
-#import numpy as np
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon, LineString, Point
+from itertools import combinations
+from Geometric_Three_Points import generate_quadrilaterals, corner_points
+import numpy as np
 
 
 valid_quads = generate_quadrilaterals(corner_points)
@@ -188,11 +189,11 @@ show_saved_two_face_cuboid()
 
 #Face_Determination_Two----------------------------------
 
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon
-#import numpy as np
-#from Geometric_Three_Points import generate_quadrilaterals, corner_points
-#from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
+import numpy as np
+from Geometric_Three_Points import generate_quadrilaterals, corner_points
+from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
 
 if saved_final_two_face_cuboid:
     extracted_faces = extract_faces_from_saved_plot(saved_final_two_face_cuboid)
@@ -217,14 +218,14 @@ else:
 
 #Camera_Distance_Estimation_Two----------------------------
 
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
-#from shapely.geometry import Polygon
-#import numpy as np
-#from Geometric_Three_Points import corner_points
-#from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
-#from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
-#import os
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from shapely.geometry import Polygon
+import numpy as np
+from Geometric_Three_Points import corner_points
+from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
+import os
 
 if __name__ == "__main__":
     main()
