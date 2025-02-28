@@ -56,7 +56,7 @@ def match_vertices_series(series, threshold_factor=2):
 
         active_tracks = new_tracks
 
-    tracked_series = [track for track in point_tracks.values() if len(track) >= 3]
+    tracked_series = [track for track in point_tracks.values() if len(track) >= 5]
 
     return tracked_series, all_matches
 
