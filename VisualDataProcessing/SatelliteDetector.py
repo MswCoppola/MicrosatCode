@@ -38,7 +38,7 @@ class Satellite:
             plt.show()
         rot_ax = dp.analyze_and_plot_ellipses(matched_corner_lists[0])
         self.rot_ax = rot_ax[0]
-        return
+        return rot_ax[1]
 
     def face_saving(self, unkown):   # ####################################### Gregs code for determining faces
         valid_quads = dp.generate_quadrilaterals(unkown)
