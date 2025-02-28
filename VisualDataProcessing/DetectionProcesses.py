@@ -349,12 +349,12 @@ def plot_classified_faces(classified_faces):
     plt.show()
 
 #Camera_Distance_Estimation-----------
-#import numpy as np
-#from shapely.geometry import LineString
-#from Geometric_Three_Points import corner_points
-#from Cuboid_Detection import cuboid_candidates
-#import matplotlib.pyplot as plt
-#import os
+import numpy as np
+from shapely.geometry import LineString
+from Geometric_Three_Points import corner_points
+from Cuboid_Detection import cuboid_candidates
+import matplotlib.pyplot as plt
+import os
 
 # Suppress threading warnings
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -436,11 +436,11 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
     plt.show()
 
 
-def Camera_Distance_Estimation():
+def Camera_Distance_Estimation(pntlst):
     """Estimate camera position vector from cuboid center of mass with X, Y in meters."""
     if cuboid_candidates:
         faces = cuboid_candidates[0]["faces"]
-        center_of_mass = calculate_center_of_mass(corner_points)
+        center_of_mass = calculate_center_of_mass(pntlst)
         print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
 
         # 2D Plot with center of mass (correctly referencing the cuboid faces)
@@ -804,7 +804,10 @@ def Camera_Distance_Estimation_Two(corn_list):
             camera_vector = compute_camera_vector(center_of_mass, distance)
             print(f"🎯 Camera position vector (X, Y, Z in meters): {camera_vector}")
             plot_3d_camera_position(camera_vector, center_of_mass)
+            return camera_vector
         else:
             print("❌ Distance estimation failed.")
+            return None
     else:
         print("❌ Required data not available: Either no saved cuboid plot or face identification missing.")
+        return None
