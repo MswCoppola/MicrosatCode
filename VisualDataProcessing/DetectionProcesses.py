@@ -725,7 +725,7 @@ os.environ["MKL_NUM_THREADS"] = "1"
 PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel
 FOCAL_LENGTH_CM = 0.5   # Camera focal length in cm
 REAL_SHORT_CM = 3       # Real short edge length in cm
-REAL_LONG_CM = 9        # Real long edge length in cm
+REAL_LONG_CM = 20        # Real long edge length in cm
 EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM  # Expected aspect ratio = 3.0
 
 def calculate_center_of_mass(corner_points):
