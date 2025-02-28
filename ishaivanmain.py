@@ -7,7 +7,16 @@ import subprocess  # For running take_picture.py
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from robotnik_navigation_msgs.msg import MoveAction, MoveGoal
- 
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+from VisualDataProcessing import SatelliteDetector as SD
+#from Robot import take_picture as tp
+import os
+from VisualDataProcessing import Corner_Grouping as CornerGrouping
+from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
+
+
 # ROS Action Clients
 arm_client = None
 base_client = None
@@ -127,7 +136,7 @@ def main():
     print(current_satellite.corner_lib)
     #----------Ruan code, use process output as input---------------
     print(Cornergrouping.match_vertices_series(all_point_lst, 2))
-    EllipseFitting.analyze_and_plot_ellipses(Cornergrouping.match_vertices_series(all_point_lst, 2)[0])
+    rotation = EllipseFitting.analyze_and_plot_ellipses(Cornergrouping.match_vertices_series(all_point_lst, 2)[0])
  
     input("🔹 Press Enter to move the base forward...")
  
