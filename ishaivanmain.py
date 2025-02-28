@@ -106,8 +106,8 @@ def main():
     imlst = []
     all_point_dic = {}
     all_point_lst = []
-    for img in os.listdir(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics"):
-        imlst.append(os.path.join(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics",img))
+    for img in os.listdir(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/"):
+        imlst.append(os.path.join(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/",img))
     while it < len(imlst) and rot_det is False:
         try:
             imcol = cv2.imread(imlst[it])
