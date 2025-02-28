@@ -15,7 +15,7 @@ def analyze_and_plot_ellipses(ellipse_data):
     - (m, c): Slope and intercept of the best-fit line (y = mx + c).
     - theta: Viewing angle in degrees.
     """
-
+    rot_true = False
     def fit_ellipse(points):
         """Fit an ellipse to a given set of points using least squares."""
         A = np.array([[x ** 2, x * y, y ** 2, x, y, 1] for x, y in points])
@@ -82,6 +82,7 @@ def analyze_and_plot_ellipses(ellipse_data):
 
     # Compute best-fit line
     if len(centers) > 1 and eccentricities:
+        rot_true = True
         m, c = fit_best_fit_line(centers)
         x_min, x_max = min(x for x, _ in centers) - 2, max(x for x, _ in centers) + 2
         x_line = np.linspace(x_min, x_max, 100)
@@ -105,7 +106,7 @@ def analyze_and_plot_ellipses(ellipse_data):
     plt.grid()
     plt.show()
 
-    return (m, c), theta
+    return [(m, c), theta], rot_true
 
 
 # Example usage
