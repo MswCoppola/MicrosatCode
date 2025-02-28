@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-from VisualDataProcessing import DetectionProcesses as dp
-from VisualDataProcessing.BaseFunctions import Locator as il
+from VisualDataProcessing.BaseFunctions import Locator as il, DetectionProcesses as dp
 from matplotlib import pyplot as plt
 
 
@@ -17,14 +16,37 @@ class Satellite:
     def image_extractor(self, unkown):  # ####################################### Can be used to take a snapshot
         return
 
-    def corner_grouper(self, unkown):   # ####################################### Can be used to link corners across multiple image
+    def rotation_axis_determination(self, all_corners):   # ####################################### Can be used to link corners across multiple image
+        matched_corner_lists = dp.match_vertices_series(all_corners)
+        print(matched_corner_lists[0])
+        for i in range(0, len(matched_corner_lists[0])):
+
+            self.corner_lib[f"corner_{i}"] = matched_corner_lists[0][i]
+            plottable_array = np.array(matched_corner_lists[0][i])
+            x, y = plottable_array.T
+            xm, ym = np.mean(x), np.mean(y)
+            std_x = np.std(x)
+            std_y = np.std(y)
+            for j in range(0, len(matched_corner_lists[0][i])-1):
+                xj, yj = matched_corner_lists[0][i][j]
+                if abs(xj - xm) >= 2*std_x or abs(yj - ym) >= 2*std_y:
+                    del matched_corner_lists[0][i][j]
+            plottable_array = np.array(matched_corner_lists[0][i])
+            x, y = plottable_array.T
+            plt.scatter(x, y)
+            plt.scatter(xm, ym)
+            plt.show()
+        rot_ax = dp.analyze_and_plot_ellipses(matched_corner_lists[0])
+        self.rot_ax = rot_ax[0]
         return
 
     def face_saving(self, unkown):   # ####################################### Gregs code for determining faces
-        return
+        valid_quads = dp.generate_quadrilaterals(unkown)
+        cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, unkown)
+        return cuboid_candidates
 
     def loc_on_screen(self, imcol, wind_sens= 0.05):  # uses a colour input image and block size for binning
-        block = (imcol.shape[1] // 10, imcol.shape[0] // 10)  # Bin size for binning
+        block = (imcol.shape[1] // 15, imcol.shape[0] // 15)  # Bin size for binning
         (xp, yp), (rel_x, rel_y), window = il.loc_on_screen(imcol, block, wind_sens)
         self.screen_pos = (rel_x, rel_y)
         return (rel_x, rel_y), window       # Outputs relative position of target on screen and the window which contains that target
@@ -39,22 +61,17 @@ class Satellite:
             masked_img = cv2.bitwise_and(edge_col, edge_col, mask=mask)     # Subtracts the edges from the image to create clearly separated faces
             pic = dp.Corner_and_edge_outliner(masked_img, True)     # Determines and outlines the corners
 
-            grpd_corn = dp.filter_close_points(pic[2], 10)      # Input=(array of points, max pixel distance to average 2 or more points)
+
+            grpd_corn = dp.filter_close_points(pic[2], 15)      # Input=(array of points, max pixel distance to average 2 or more points)
             extr = mask.copy()
+            extr_img = img.copy()
 
             for i in grpd_corn:         # Circles the corners in the image (visual assistance only)
-                cv2.circle(extr, i, 4, (100, 100, 100), -1)
-
-
-            plt.plot(), plt.imshow(extr, cmap="gray"), plt.title('Final cornered image')
-            plt.show()
-            plt.plot(), plt.imshow(image_processed), plt.title('Debugging image mask')
-            plt.show()
+                cv2.circle(extr_img, i, 4, (255, 255, 255), -1)
         except:
             print("Was not able to process the image")
             return
-
-        return pic      # Adjust this return to return the necessary outputs from each function
+        return grpd_corn      # Adjust this return to return the necessary outputs from each function
 
     def __str__(self):      # If you use print(satellite) this will be the printed statement
         print(f"Size of the satellite is {self.width}'W',{self.depth}'D'{self.heigth}'H' ")
