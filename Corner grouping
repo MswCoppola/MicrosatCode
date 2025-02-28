@@ -3,81 +3,80 @@ import matplotlib.pyplot as plt
 from scipy.optimize import linear_sum_assignment
 
 
-def match_vertices_series(series, threshold_factor=1.7):
-    """
-    Matches corresponding vertices across multiple 2D projections and returns the series of coordinates for each point.
+def compute_slope(p1, p2):
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    return dy / dx if dx != 0 else np.inf
 
-    Parameters:
-        series (list of np.ndarray): List of 2D point sets, each representing a frame.
-        threshold_factor (float): Multiplier for the mean distance threshold.
 
-    Returns:
-        list: List of coordinate series for each tracked point across frames.
-    """
+def match_vertices_series(series, threshold_factor=2):
     all_matches = []
     point_tracks = {i: [tuple(series[0][i])] for i in range(len(series[0]))}  # Initialize tracking
+    active_tracks = {i: i for i in range(len(series[0]))}  # Track active indices
 
     for i in range(len(series) - 1):
         points1, points2 = series[i], series[i + 1]
-
-        # Compute pairwise Euclidean distance matrix
         cost_matrix = np.linalg.norm(points1[:, np.newaxis, :] - points2[np.newaxis, :, :], axis=2)
-
-        # Solve assignment problem using Hungarian algorithm
         row_ind, col_ind = linear_sum_assignment(cost_matrix)
         matched_pairs = list(zip(row_ind, col_ind))
 
-        # Compute distances of assigned pairs
         match_distances = [cost_matrix[i1, i2] for i1, i2 in matched_pairs]
-
-        # Compute threshold
         distance_threshold = threshold_factor * np.mean(match_distances)
 
-        # Filter out matches exceeding the threshold
-        filtered_matches = [(i1, i2) for (i1, i2) in matched_pairs if cost_matrix[i1, i2] <= distance_threshold]
+        filtered_matches = []
+        used_points2 = set()
+        for i1, i2 in matched_pairs:
+            slope = compute_slope(points1[i1], points2[i2])
+            if cost_matrix[i1, i2] <= distance_threshold and abs(slope) <= 1 and i2 not in used_points2:
+                filtered_matches.append((i1, i2))
+                used_points2.add(i2)
+            else:
+                alternative_matches = sorted(
+                    [(j, cost_matrix[i1, j]) for j in range(len(points2)) if j != i2 and j not in used_points2],
+                    key=lambda x: x[1])
+                for j, _ in alternative_matches:
+                    new_slope = compute_slope(points1[i1], points2[j])
+                    if abs(new_slope) <= 1:
+                        filtered_matches.append((i1, j))
+                        used_points2.add(j)
+                        break
 
         all_matches.append(filtered_matches)
 
-        # Update point tracks
         new_tracks = {}
         for i1, i2 in filtered_matches:
-            if i1 in point_tracks:
-                point_tracks[i1].append(tuple(points2[i2]))
-                new_tracks[i2] = point_tracks[i1]  # Assign continuation to new index
+            if i1 in active_tracks:
+                track_id = active_tracks[i1]
+                point_tracks[track_id].append(tuple(points2[i2]))
+                new_tracks[i2] = track_id
             else:
-                point_tracks[i2] = [tuple(points2[i2])]
+                track_id = max(point_tracks.keys()) + 1
+                point_tracks[track_id] = [tuple(points2[i2])]
+                new_tracks[i2] = track_id
 
-        point_tracks = new_tracks  # Update tracking for next iteration
+        active_tracks = new_tracks
 
-    return list(point_tracks.values()), all_matches
+    tracked_series = [track for track in point_tracks.values() if len(track) >= 3]
+
+    return tracked_series, all_matches
 
 
 def plot_matching_series(series, all_matches):
-    """
-    Plots the matched points across multiple 2D projections.
-    """
     for i in range(len(series) - 1):
         points1, points2 = series[i], series[i + 1]
         matches = all_matches[i]
 
         plt.figure(figsize=(6, 6))
-
-        # Plot points from the first image (red)
         for j, (x, y) in enumerate(points1):
             plt.scatter(x, y, color='red', label="Frame " + str(i) if j == 0 else "", s=50)
             plt.text(x, y, f"{j}", fontsize=12, color='red', verticalalignment='bottom')
-
-        # Plot points from the second image (blue)
         for j, (x, y) in enumerate(points2):
             plt.scatter(x, y, color='blue', label="Frame " + str(i + 1) if j == 0 else "", s=50)
             plt.text(x, y, f"{j}", fontsize=12, color='blue', verticalalignment='bottom')
-
-        # Draw matching lines
         for i1, i2 in matches:
             x_values = [points1[i1, 0], points2[i2, 0]]
             y_values = [points1[i1, 1], points2[i2, 1]]
             plt.plot(x_values, y_values, 'gray', linestyle='dashed', alpha=0.7)
-
         plt.legend()
         plt.xlabel("X")
         plt.ylabel("Y")
@@ -86,18 +85,21 @@ def plot_matching_series(series, all_matches):
         plt.show()
 
 
-# Example usage
 def grouping():
     series = [
-        np.array([[419, 243], [394, 250], [414, 352], [430, 365], [454, 353], [436, 252]]),
-        np.array([[427, 244], [400, 251], [415, 258], [414, 271], [399, 256], [401, 352], [414, 364], [443, 357],
-                  [444, 253]]),
-        np.array([[404, 229], [500, 386], [542,371],  [450, 209],  [446,205],  [416,201],  [386,216],  [403, 225]])
+        np.array([(536, 270), (513, 301), (553, 328), (573, 293)]),
+        np.array([(497, 296), (459, 332), (513, 441), (546, 410), (467, 270), (429, 301)]),
+        np.array([(385, 332), (557, 447), (591, 412), (423, 298), (419, 273)]),
+        np.array([(362, 321), (581, 448), (616, 420), (385, 295), (393, 271), (620, 390), (497, 350)]),
+        np.array([(367, 289), (601, 424), (623, 398), (389, 269)]),
+        np.array([(612, 405), (579, 431), (583, 460), (615, 433), (381, 289), (410, 270)]),
+        np.array([(577, 408), (537, 433), (553, 466), (594, 437), (409, 280), (561, 408), (426, 271)]),
+        np.array([(556, 412), (514, 438), (537, 468), (579, 441)]),
+        np.array([(526, 409), (484, 437), (512, 469), (554, 443), (471, 277), (550, 428), (490, 296)]),
+        np.array([(515, 408), (482, 439), (506, 469), (546, 438), (482, 274), (507, 297)])
     ]
-
     tracked_series, all_matches = match_vertices_series(series)
     plot_matching_series(series, all_matches)
-
     print("Tracked Point Series:")
     print(tracked_series)
 
