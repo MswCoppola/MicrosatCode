@@ -41,11 +41,14 @@ class Satellite:
         return rot_ax[1]
 
     def face_saving(self, pntl):   # ####################################### Gregs code for determining faces
+        valid_quads = dp.generate_quadrilaterals(pntl)
         if len(pntl) == 7:
-            valid_quads = dp.generate_quadrilaterals(pntl)
             cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, pntl)
-            
+            distance = dp.Camera_Distance_Estimation(pntl)
+            return distance
         elif len(pntl) == 6:
+            desired_comb = dp.plot_shared_edge_combination(valid_quads)
+            coboid_candidates = dp.fileter_final_combination(desired_comb)
             pass
         else:
             return None
