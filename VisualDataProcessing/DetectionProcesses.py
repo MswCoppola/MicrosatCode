@@ -7,6 +7,10 @@ from shapely.geometry import Polygon
 from itertools import combinations
 import math
 import subprocess
+from shapely.geometry import Polygon, Point, LineString
+from scipy.optimize import linear_sum_assignment
+from VisualDataProcessing.BaseFunctions.Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
+
 
 def canny_edge_detector(img, can1, can2, double =False): #can1,  can2 are the hysteria thresholds
     im_gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
