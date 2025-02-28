@@ -161,7 +161,7 @@ import os
 
 
 if __name__ == "__main__":
-    main()
+    Camera_Distance_Estimation()
 
 #Cuboid_Detection_Two-----------------------
 
@@ -231,6 +231,6 @@ from Face_Determination_Two import classified_faces  # Import face identificatio
 import os
 
 if __name__ == "__main__":
-    main()
+    Camera_Distance_Estimation_Two()
 
 
