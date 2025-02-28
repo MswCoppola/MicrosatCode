@@ -40,9 +40,15 @@ class Satellite:
         self.rot_ax = rot_ax[0]
         return rot_ax[1]
 
-    def face_saving(self, unkown):   # ####################################### Gregs code for determining faces
-        valid_quads = dp.generate_quadrilaterals(unkown)
-        cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, unkown)
+    def face_saving(self, pntl):   # ####################################### Gregs code for determining faces
+        if len(pntl) == 7:
+            valid_quads = dp.generate_quadrilaterals(pntl)
+            cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, pntl)
+            
+        elif len(pntl) == 6:
+            pass
+        else:
+            return None
         return cuboid_candidates
 
     def loc_on_screen(self, imcol, wind_sens= 0.05):  # uses a colour input image and block size for binning
