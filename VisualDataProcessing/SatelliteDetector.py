@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from VisualDataProcessing.BaseFunctions import Locator as il, DetectionProcesses as dp
 from matplotlib import pyplot as plt
+from VisualDataProcessing import Corner_Grouping as CornerGrouping
+from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
 
 
 class Satellite:
@@ -17,7 +19,7 @@ class Satellite:
         return
 
     def rotation_axis_determination(self, all_corners):   # ####################################### Can be used to link corners across multiple image
-        matched_corner_lists = dp.match_vertices_series(all_corners)
+        matched_corner_lists = CornerGrouping.match_vertices_series(all_corners,2)
         print(matched_corner_lists[0])
         for i in range(0, len(matched_corner_lists[0])):
 
@@ -36,7 +38,7 @@ class Satellite:
             plt.scatter(x, y)
             plt.scatter(xm, ym)
             plt.show()
-        rot_ax = dp.analyze_and_plot_ellipses(matched_corner_lists[0])
+        rot_ax = EllipseFitting.analyze_and_plot_ellipses(matched_corner_lists[0])
         self.rot_ax = rot_ax[0]
         return rot_ax[1]
 
