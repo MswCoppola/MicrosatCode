@@ -9,8 +9,7 @@ def analyze_and_plot_ellipses(ellipse_data):
     2. Finds the centers and eccentricities of each ellipse.
     3. Calculates the best-fit line through the ellipse centers.
     4. Computes the average eccentricity and viewing angle θ (arcsin(e_avg)).
-    5. If e_avg ≥ 0.9, draws a perpendicular line through the midpoint of centers.
-    6. Plots everything: ellipses, centers, best-fit line, and perpendicular line if applicable.
+    5. Plots everything: ellipses, centers, and the best-fit line.
 
     Returns:
     - (m, c): Slope and intercept of the best-fit line (y = mx + c).
@@ -36,7 +35,8 @@ def analyze_and_plot_ellipses(ellipse_data):
         eigenvalues, _ = np.linalg.eig(matrix)
         if np.any(eigenvalues <= 0): return None, None, None  # Invalid ellipse
         a, b = np.sqrt(1 / np.min(eigenvalues)), np.sqrt(1 / np.max(eigenvalues))
-        return a, b, np.sqrt(1 - (b ** 2 / a ** 2))  # Eccentricity
+        e = np.sqrt(1 - (b ** 2 / a ** 2))
+        return a, b, e if e < 1 else (None, None, None)  # Filter out invalid ellipses
 
     def fit_best_fit_line(centers):
         """Perform least squares regression for best-fit line y = mx + c through centers."""
@@ -55,31 +55,29 @@ def analyze_and_plot_ellipses(ellipse_data):
     for idx, points in enumerate(ellipse_data):
         coeffs = fit_ellipse(points)
         center = ellipse_center(coeffs)
-        if center:
-            print(f"Ellipse {idx + 1} Center: {center}")
-            centers.append(center)
-
         a, b, e = ellipse_axes(coeffs)
-        if a and b:
+
+        if center and a and b:
+            print(f"Ellipse {idx + 1} Center: {center}")
             print(f"Ellipse {idx + 1} Semi-Major Axis (a): {a:.4f}, Semi-Minor Axis (b): {b:.4f}")
             print(f"Ellipse {idx + 1} Eccentricity: {e:.4f}")
+            centers.append(center)
             eccentricities.append(e)
 
-        # Generate ellipse contour for plotting
-        x_vals = np.linspace(min(p[0] for p in points) - 3, max(p[0] for p in points) + 3, 400)
-        y_vals = np.linspace(min(p[1] for p in points) - 3, max(p[1] for p in points) + 3, 400)
-        X, Y = np.meshgrid(x_vals, y_vals)
-        Z = sum(coeffs[i] * term for i, term in enumerate([X ** 2, X * Y, Y ** 2, X, Y, np.ones_like(X)]))
+            # Generate ellipse contour for plotting
+            x_vals = np.linspace(min(p[0] for p in points) - 3, max(p[0] for p in points) + 3, 400)
+            y_vals = np.linspace(min(p[1] for p in points) - 3, max(p[1] for p in points) + 3, 400)
+            X, Y = np.meshgrid(x_vals, y_vals)
+            Z = sum(coeffs[i] * term for i, term in enumerate([X ** 2, X * Y, Y ** 2, X, Y, np.ones_like(X)]))
 
-        if Z.min() < 0 < Z.max():
-            plt.contour(X, Y, Z, levels=[0], colors=colors[idx % len(colors)], linewidths=2)
+            if Z.min() < 0 < Z.max():
+                plt.contour(X, Y, Z, levels=[0], colors=colors[idx % len(colors)], linewidths=2)
 
-        # Plot original points
-        px, py = zip(*points)
-        plt.scatter(px, py, color=colors[idx % len(colors)], label=f"Ellipse {idx + 1} Points", zorder=3)
+            # Plot original points
+            px, py = zip(*points)
+            plt.scatter(px, py, color=colors[idx % len(colors)], label=f"Ellipse {idx + 1} Points", zorder=3)
 
-        # Plot ellipse center
-        if center:
+            # Plot ellipse center
             plt.scatter(*center, color=colors[idx % len(colors)], marker='x', s=100, label=f"Ellipse {idx + 1} Center")
 
     # Compute best-fit line
@@ -96,23 +94,6 @@ def analyze_and_plot_ellipses(ellipse_data):
         theta = np.arcsin(e_avg) * (180 / np.pi)  # Convert radians to degrees
         print(f"Average Eccentricity: {e_avg:.4f}")
         print(f"Viewing Angle (θ) = arcsin(e_avg): {theta:.4f}°")
-
-        # If e_avg is high, draw a perpendicular line through the midpoint of the centers
-        if e_avg >= 0.9:
-            x_mid, y_mid = np.mean(centers, axis=0)  # Compute midpoint of centers
-            perp_slope = -1 / m if m != 0 else np.inf  # Perpendicular slope
-
-            # Compute line points
-            if perp_slope == np.inf:
-                x_perp = np.array([x_mid, x_mid])
-                y_perp = np.array([y_mid - 5, y_mid + 5])
-            else:
-                x_perp = np.linspace(x_mid - 5, x_mid + 5, 100)
-                y_perp = perp_slope * (x_perp - x_mid) + y_mid
-
-            plt.plot(x_perp, y_perp, 'b-', linewidth=2, label="Perpendicular Line")
-            print(f"Perpendicular Line through ({x_mid:.2f}, {y_mid:.2f})")
-
     else:
         m, c, theta = None, None, None
 
@@ -128,12 +109,11 @@ def analyze_and_plot_ellipses(ellipse_data):
 
 
 # Example usage
-ellipse_data = [
-    [(1, 0.87), (0.3, 0.99), (0.6, 0.95), (1.2, 0.8), (1.5, 0.66), (2, 0), (0, 1), (1.8, 0.44)],  # Ellipse 1
-    [(4, 5.87), (3.3, 5.99), (3.6, 5.95), (4.2, 5.8), (4.5, 5.66), (5, 5), (3, 6), (4.8, 5.44)],  # Ellipse 2
-    [(6, 9.87), (5.3, 9.99), (5.6, 9.95), (6.2, 9.8), (6.5, 9.66), (7, 9), (5, 10), (6.8, 9.44)],  # Ellipse 3
-]
+ellipse_data = [[(536, 270), (467, 270), (419, 273), (393, 271), (389, 269), (410, 270), (426, 271)], [(553, 328), (459, 332), (385, 332), (362, 321)], [(573, 293), (429, 301), (423, 298), (385, 295), (367, 289), (381, 289), (409, 280)], [(591, 412), (616, 420), (601, 424), (615, 433), (561, 408), (556, 412), (526, 409), (515, 408)], [(594, 437), (579, 441), (554, 443), (546, 438)], [(553, 466), (537, 468), (512, 469), (506, 469)], [(514, 438), (484, 437), (482, 439)]]
+
 
 best_fit_line, theta = analyze_and_plot_ellipses(ellipse_data)
 print(f"Best-Fit Line: y = {best_fit_line[0]:.4f}x + {best_fit_line[1]:.4f}")
 print(f"Viewing Angle (θ) = {theta:.4f}°")
+
+
