@@ -471,11 +471,11 @@ def Camera_Distance_Estimation(pntlst):
     else:
         print("❌ No valid cuboid detected.")
 #Cuboid_Detection_Two------------------------
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon, LineString, Point
-#from itertools import combinations
-#from Geometric_Three_Points import generate_quadrilaterals, corner_points
-#import numpy as np
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon, LineString, Point
+from itertools import combinations
+from Geometric_Three_Points import generate_quadrilaterals, corner_points
+import numpy as np
 
 # -------------------- Global Variable for Final Plot --------------------
 saved_final_two_face_cuboid = None  # Global variable to store the final two-face cuboid plot figure
@@ -600,6 +600,7 @@ def filter_final_combination(filtered_combinations):
 
         saved_final_two_face_cuboid = fig  # Save the final two-face cuboid plot figure
         plt.show()
+        return saved_final_two_face_cuboid
     else:
         print("No valid cuboid representation found after final filtering.")
 
@@ -611,11 +612,11 @@ def show_saved_two_face_cuboid():
         print("⚠️  No saved two-face cuboid plot available to display.")
 
 #Face_Determination_Two----------------------------
-#import matplotlib.pyplot as plt
-#from shapely.geometry import Polygon
-#import numpy as np
-#from Geometric_Three_Points import generate_quadrilaterals, corner_points
-#from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
+import numpy as np
+from Geometric_Three_Points import generate_quadrilaterals, corner_points
+from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
 
 def compute_face_area(face):
     """Compute the area of a quadrilateral face."""
@@ -780,9 +781,9 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
     plt.title('Camera Position and Vector Relative to Cuboid Center of Mass (Meters)')
     plt.show()
 
-def Camera_Distance_Estimation_Two(corn_list):
+def Camera_Distance_Estimation_Two(corn_list, two_cuboid):
     """Estimate camera position vector and plot it in 3D using pre-identified faces."""
-    if saved_final_two_face_cuboid and classified_faces:
+    if two_cuboid and classified_faces:
         center_of_mass = calculate_center_of_mass(corn_list)
         print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
 
