@@ -24,6 +24,8 @@ from matplotlib import pyplot as plt
 from VisualDataProcessing import SatelliteDetector as SD
 #from Robot import take_picture as tp
 import os
+from VisualDataProcessing as import Corner grouping as CornerGrouping
+from VisualDataProcessing as import Ellipse Fitting as EllipseFitting
 
 
 if __name__ == "__main__":
@@ -56,6 +58,9 @@ if __name__ == "__main__":
     current_satellite.rotation_axis_determination(all_point_lst)
     print(current_satellite.corner_lib)
     #----------Ruan code, use process output as input---------------
+    print(Cornergrouping.match_vertices_series(all_point_lst, 2))
+    EllipseFitting.analyze_and_plot_ellipses(Cornergrouping.match_vertices_series(all_point_lst, 2)[0]):
+    
 
     #imcol = cv2.imread(r"C:\Users\massi\Downloads\TryImage_block_blackEdge.jpeg")
     #image_resized = cv2.resize(imcol, (900, 500))       # Resize the image to constant and processable dimensions
