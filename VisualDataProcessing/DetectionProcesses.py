@@ -355,7 +355,6 @@ def plot_classified_faces(classified_faces):
 #Camera_Distance_Estimation-----------
 import numpy as np
 from shapely.geometry import LineString
-from Geometric_Three_Points import corner_points
 from Cuboid_Detection import cuboid_candidates
 import matplotlib.pyplot as plt
 import os
@@ -478,7 +477,6 @@ def Camera_Distance_Estimation(pntlst):
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, LineString, Point
 from itertools import combinations
-from Geometric_Three_Points import generate_quadrilaterals, corner_points
 import numpy as np
 
 # -------------------- Global Variable for Final Plot --------------------
@@ -619,7 +617,6 @@ def show_saved_two_face_cuboid():
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 import numpy as np
-from Geometric_Three_Points import generate_quadrilaterals, corner_points
 from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
 
 def compute_face_area(face):
@@ -716,7 +713,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from shapely.geometry import Polygon
 import numpy as np
-from Geometric_Three_Points import corner_points
 from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
 from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
 import os
