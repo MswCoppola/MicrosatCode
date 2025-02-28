@@ -361,7 +361,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
 # Constants
-PIXEL_SIZE_CM = 0.0008  # 8 microns per pixel (comment: Adjusted pixel size assumption)
+PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel (comment: Adjusted pixel size assumption)
 FOCAL_LENGTH_CM = 0.5  # Camera focal length in cm
 REAL_SHORT_CM = 3      # Real short edge length in cm
 REAL_LONG_CM = 9       # Real long edge length in cm
@@ -722,7 +722,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
 # Constants
-PIXEL_SIZE_CM = 0.0008  # 8 microns per pixel
+PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel
 FOCAL_LENGTH_CM = 0.5   # Camera focal length in cm
 REAL_SHORT_CM = 3       # Real short edge length in cm
 REAL_LONG_CM = 9        # Real long edge length in cm
