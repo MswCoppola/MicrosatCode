@@ -160,8 +160,6 @@ import matplotlib.pyplot as plt
 import os
 
 
-if __name__ == "__main__":
-    Camera_Distance_Estimation()
 
 #Cuboid_Detection_Two-----------------------
 
@@ -230,7 +228,5 @@ from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plo
 from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
 import os
 
-if __name__ == "__main__":
-    Camera_Distance_Estimation_Two()
 
 
