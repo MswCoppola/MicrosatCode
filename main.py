@@ -38,8 +38,8 @@ if __name__ == "__main__":
     imlst = []
     all_point_dic = {}
     all_point_lst = []
-    for img in os.listdir(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics"):
-        imlst.append(os.path.join(r"C:\Users\massi\Downloads\OneDrive_2025-02-26\target pics",img))
+    for img in os.listdir(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/"):
+        imlst.append(os.path.join(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/",img))
     while it < len(imlst) and rot_det is False:
         try:
             imcol = cv2.imread(imlst[it])
@@ -52,14 +52,12 @@ if __name__ == "__main__":
             process = current_satellite.current_corners(image_resized, kernel, rect)  # Runs the entire corner detection, grouping etc, the output can be defined in the SatelliteDetector.py file
             all_point_dic[f"img_{it}_corners"] = process
             all_point_lst.append(np.array(process))
+            distance = current_satellite.face_saving(process)
         except:
             print("Unable to determine corners")
     print(all_point_lst)
     current_satellite.rotation_axis_determination(all_point_lst)
     print(current_satellite.corner_lib)
-    #----------Ruan code, use process output as input---------------
-    print(Cornergrouping.match_vertices_series(all_point_lst, 2))
-    EllipseFitting.analyze_and_plot_ellipses(Cornergrouping.match_vertices_series(all_point_lst, 2)[0])
     
 
     #imcol = cv2.imread(r"C:\Users\massi\Downloads\TryImage_block_blackEdge.jpeg")
