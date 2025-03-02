@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 from VisualDataProcessing import SatelliteDetector as SD
 #from Robot import take_picture as tp
 import os
-from VisualDataProcessing import Corner_Grouping as CornerGrouping
+from VisualDataProcessing import Corner_grouping as CornerGrouping
 from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
 
 
