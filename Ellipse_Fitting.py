@@ -107,13 +107,14 @@ def analyze_and_plot_ellipses(ellipse_data):
 
     return (m, c), theta
 
-
+"""
 # Example usage
 ellipse_data = [
     [(536, 270), (467, 270), (419, 273), (393, 271), (389, 269), (410, 270), (426, 271)],  # Ellipse 1
     [(573, 293), (429, 301), (423, 298), (385, 295), (367, 289), (381, 289), (409, 280)],  # Ellipse 2
     [(591, 412), (616, 420), (601, 424), (615, 433), (561, 408), (556, 412), (526, 409), (515, 408)],  # Ellipse 3
 ]
+"""
 
 best_fit_line, theta = analyze_and_plot_ellipses(ellipse_data)
 print(f"Best-Fit Line: y = {best_fit_line[0]:.4f}x + {best_fit_line[1]:.4f}")
