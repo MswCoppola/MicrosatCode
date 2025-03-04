@@ -9,32 +9,37 @@ import math
 import subprocess
 from shapely.geometry import Polygon, Point, LineString
 from scipy.optimize import linear_sum_assignment
-from VisualDataProcessing.BaseFunctions.Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
+#from VisualDataProcessing.BaseFunctions.Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
 
 
 def canny_edge_detector(img, can1, can2, double =False): #can1,  can2 are the hysteria thresholds
+    img_f = img.astype(np.uint8)
+    print('calling canny edge')
     im_gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_canny = cv2.Canny(img, can1, can2, np.array(img.shape), 7)   # creating the canny edge image for processing
-    kernel = np.ones((3, 3))                                         # defining kernel for dilation and erosion
+    plt.plot(), plt.imshow(img_f), plt.title('image for canny detection')
+    plt.show()
+    img_canny = cv2.Canny(img_f, can1, can2, 7)   # creating the canny edge image for processing
+    kernel = np.ones((3, 3))
+    print('processed completed')# defining kernel for dilation and erosion
     img_dilate = cv2.dilate(img_canny, kernel, iterations=1)
     corners = cv2.cornerHarris(im_gr,3,3,0.2)
 
     b = np.argwhere(corners >= 0.5 * corners.max())  # finding the maximum corners (doesn't fully work, only in specific situations)
 
     """ Debuging images"""
-    # plt.plot(), plt.imshow(img), plt.title('image for mapping')
-    # plt.show()
+    plt.plot(), plt.imshow(img), plt.title('image for mapping')
+    plt.show()
     plt.plot(), plt.imshow(img_canny), plt.title(f'canny image for double is {double}')
     plt.show()
-    # plt.plot(), plt.imshow(corners), plt.title('corner weights')
-    # plt.show()
+    plt.plot(), plt.imshow(corners), plt.title('corner weights')
+    plt.show()
 
     """ Debugging for large corners"""
-    #print(f"b = {b}")
-    #print(f"b-1 = {b[:,::-1]}")
-    #print(f"corners = {corners}")
-    #print(f"corner shape = {corners.shape}")
-    #print(f"max corner = {corners[b[:,::-1]]}")
+    print(f"b = {b}")
+    print(f"b-1 = {b[:,::-1]}")
+    print(f"corners = {corners}")
+    print(f"corner shape = {corners.shape}")
+    print(f"max corner = {corners[b[:,::-1]]}")
 
     inverted_mask = cv2.bitwise_not(img_dilate)     # Invert the edge intensity to accomodate removal of edges from the image in later stage
     return inverted_mask
@@ -56,7 +61,7 @@ def background_remover(img, rect):                # Provide a rectangle section 
     img_new = img*mask2[:,:,np.newaxis]
 
     """ Debugging images"""
-    plt.plot(), plt.imshow(imgray, cmap="gray"), plt.title('Internal Debugging image from backremover')
+    plt.plot(), plt.imshow(img_new, cmap="gray"), plt.title('Internal Debugging image from backremover')
     plt.show()
 
     return mask2, img_new
@@ -106,12 +111,12 @@ def Corner_and_edge_outliner(imcol, aprx = True):   # aprx=True determines if it
                 cv2.drawContours(contoured, [approx], -1, (255, 255, 255))
 
     """ Debugging images area"""
-    #plt.plot(), plt.imshow(contoured), plt.title(f'Imgray after approx')
-    #plt.show()
+    plt.plot(), plt.imshow(contoured), plt.title(f'Imgray after approx')
+    plt.show()
     plt.plot(), plt.imshow(imcol, cmap="gray"), plt.title('Threshold')
     plt.show()
-    #plt.plot(), plt.imshow(imgray, cmap="gray"), plt.title('Imgray before contour')
-    #plt.show()
+    plt.plot(), plt.imshow(imgray, cmap="gray"), plt.title('Imgray before contour')
+    plt.show()
     if aprx is False:
         return contoured, cnts
     return contoured, approximations, all_corners
@@ -217,7 +222,7 @@ def plot_quadrilaterals(valid_quads, corner_points):
         plt.ylabel('Y')
         plt.legend()
         plt.grid(True)
-        #plt.show()
+        plt.show()
 #Cuboid_Detection----------------------------
 #import matplotlib.pyplot as plt
 #from itertools import combinations
@@ -355,7 +360,7 @@ def plot_classified_faces(classified_faces):
 #Camera_Distance_Estimation-----------
 import numpy as np
 from shapely.geometry import LineString
-from Cuboid_Detection import cuboid_candidates
+from VisualDataProcessing.Cuboid_Detection import identify_cuboids_from_faces
 import matplotlib.pyplot as plt
 import os
 
@@ -368,7 +373,7 @@ PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel (comment: Adjusted pixel size assu
 FOCAL_LENGTH_CM = 0.5  # Camera focal length in cm
 REAL_SHORT_CM = 3      # Real short edge length in cm
 REAL_LONG_CM = 9       # Real long edge length in cm
-EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM  # Expected aspect ratio = 3.0
+EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM
 
 
 def calculate_center_of_mass(corner_points):
@@ -447,7 +452,7 @@ def Camera_Distance_Estimation(pntlst):
         print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
 
         # 2D Plot with center of mass (correctly referencing the cuboid faces)
-        plot_2d_cuboid_with_center(corner_points, center_of_mass, faces)
+        plot_2d_cuboid_with_center(pntlst, center_of_mass, faces)
 
         # Approximate observed edge lengths in pixels (using validated cuboid data)
         edges = []
@@ -617,7 +622,7 @@ def show_saved_two_face_cuboid():
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 import numpy as np
-from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+#from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
 
 def compute_face_area(face):
     """Compute the area of a quadrilateral face."""
@@ -713,8 +718,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from shapely.geometry import Polygon
 import numpy as np
-from Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
-from Face_Determination_Two import classified_faces  # Import face identification from face_determination_two
+from VisualDataProcessing.Cuboid_Detection_Two import saved_final_two_face_cuboid  # Import saved plot from cuboid_determination_two
+from VisualDataProcessing.Face_Determination import classify_faces  # Import face identification from face_determination_two
 import os
 
 # Suppress threading warnings

@@ -114,7 +114,7 @@ ellipse_data = [[(536, 270), (467, 270), (419, 273), (393, 271), (389, 269), (41
 
 
 best_fit_line, theta = analyze_and_plot_ellipses(ellipse_data)
-print(f"Best-Fit Line: y = {best_fit_line[0]:.4f}x + {best_fit_line[1]:.4f}")
-print(f"Viewing Angle (θ) = {theta:.4f}°")
+#print(f"Best-Fit Line: y = {best_fit_line[0]:.4f}x + {best_fit_line[1]:.4f}")
+#print(f"Viewing Angle (θ) = {theta:.4f}°")
 
 

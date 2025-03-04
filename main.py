@@ -38,8 +38,8 @@ if __name__ == "__main__":
     imlst = []
     all_point_dic = {}
     all_point_lst = []
-    for img in os.listdir(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/"):
-        imlst.append(os.path.join(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/",img))
+    for img in os.listdir(r"C:\Users\gregd\PycharmProjects\Microsat_FInal\target_pictures"):
+        imlst.append(os.path.join(r"C:\Users\gregd\PycharmProjects\Microsat_FInal\target_pictures",img))
     while it < len(imlst) and rot_det is False:
         try:
             imcol = cv2.imread(imlst[it])
@@ -47,14 +47,14 @@ if __name__ == "__main__":
         except:
             print(f"Unable to read image number {it}")
         it += 1
-        try:
-            rel_cam_pos, rect = current_satellite.loc_on_screen(image_resized,0.10)  # Input(Resized colour image, fraction of maximum intensity which is considered !not background!)
-            process = current_satellite.current_corners(image_resized, kernel, rect)  # Runs the entire corner detection, grouping etc, the output can be defined in the SatelliteDetector.py file
-            all_point_dic[f"img_{it}_corners"] = process
-            all_point_lst.append(np.array(process))
-            distance = current_satellite.face_saving(process)
-        except:
-            print("Unable to determine corners")
+        #try:
+        rel_cam_pos, rect = current_satellite.loc_on_screen(image_resized,0.10)  # Input(Resized colour image, fraction of maximum intensity which is considered !not background!)
+        process = current_satellite.current_corners(image_resized, kernel, rect)  # Runs the entire corner detection, grouping etc, the output can be defined in the SatelliteDetector.py file
+        all_point_dic[f"img_{it}_corners"] = process
+        all_point_lst.append(np.array(process))
+        distance = current_satellite.face_saving(process)
+        #except:
+        #    print("Unable to determine corners")
     print(all_point_lst)
     current_satellite.rotation_axis_determination(all_point_lst)
     print(current_satellite.corner_lib)
