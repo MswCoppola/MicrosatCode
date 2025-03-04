@@ -84,7 +84,7 @@ def plot_matching_series(series, all_matches):
         plt.gca().invert_yaxis()
         plt.show()
 
-
+"""
 def grouping():
     series = [
         np.array([(536, 270), (513, 301), (553, 328), (573, 293)]),
@@ -106,3 +106,4 @@ def grouping():
 
 if __name__ == "__main__":
     grouping()
+"""
