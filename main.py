@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 from VisualDataProcessing import SatelliteDetector as SD
 #from Robot import take_picture as tp
 import os
-from VisualDataProcessing import Corner_Grouping as CornerGrouping
+from VisualDataProcessing import Corner_grouping as CornerGrouping
 from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
 
 
@@ -38,8 +38,8 @@ if __name__ == "__main__":
     imlst = []
     all_point_dic = {}
     all_point_lst = []
-    for img in os.listdir(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/"):
-        imlst.append(os.path.join(r"/home/robot/catkin_ws/src/microsat_group_1/src/images/",img))
+    for img in os.listdir(r"C:\Users\massi\PycharmProjects\Microsat\TargetTest"):
+        imlst.append(os.path.join(r"C:\Users\massi\PycharmProjects\Microsat\TargetTest",img))
     while it < len(imlst) and rot_det is False:
         try:
             imcol = cv2.imread(imlst[it])
@@ -52,12 +52,10 @@ if __name__ == "__main__":
             process = current_satellite.current_corners(image_resized, kernel, rect)  # Runs the entire corner detection, grouping etc, the output can be defined in the SatelliteDetector.py file
             all_point_dic[f"img_{it}_corners"] = process
             all_point_lst.append(np.array(process))
-            distance = current_satellite.face_saving(process)
+            distance = current_satellite.ranging(process)
         except:
             print("Unable to determine corners")
-    print(all_point_lst)
-    current_satellite.rotation_axis_determination(all_point_lst)
-    print(current_satellite.corner_lib)
+    #current_satellite.rotation_axis_determination(all_point_lst)
     
 
     #imcol = cv2.imread(r"C:\Users\massi\Downloads\TryImage_block_blackEdge.jpeg")
