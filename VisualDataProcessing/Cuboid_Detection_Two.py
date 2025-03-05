@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, LineString, Point
 from itertools import combinations
-from VisualDataProcessing.BaseFunctions.Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
+#from VisualDataProcessing.BaseFunctions.Geometric_Three_Points import generate_quadrilaterals, corner_points as all_corners
 import numpy as np
 
 # -------------------- Global Variable for Final Plot --------------------
@@ -127,6 +127,7 @@ def filter_final_combination(filtered_combinations):
 
         saved_final_two_face_cuboid = fig  # Save the final two-face cuboid plot figure
         plt.show()
+        return saved_final_two_face_cuboid
     else:
         print("No valid cuboid representation found after final filtering.")
 
@@ -137,22 +138,4 @@ def show_saved_two_face_cuboid():
     else:
         print("⚠️  No saved two-face cuboid plot available to display.")
 
-# -------------------- Main Execution --------------------
 
-#valid_quads = generate_quadrilaterals(corner_points)
-#print(f"Loaded {len(valid_quads)} valid quadrilaterals from Geometric_Three_Points.")
-
-# Step 1: Plot initial combinations
-#desired_combinations = plot_shared_edge_combinations(valid_quads)
-
-# Step 2: Apply final filtering to select the best cuboid representation and save the plot
-#filter_final_combination(desired_combinations)
-
-# Step 3: Show the saved final two-face cuboid plot
-#show_saved_two_face_cuboid()
-
-# -------------------- End of Script --------------------
-
-# Functions now comprehensively check for global edge overlaps and face intersections.
-# Enhanced logic incorporates disjoint face validation and stricter edge uniqueness checks.
-# The final two-face cuboid plot is saved and can be recalled using show_saved_two_face_cuboid().

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 import numpy as np
-from VisualDataProcessing.Cuboid_Detection import cuboid_candidates  # Import detected cuboid candidates
+#from VisualDataProcessing.Cuboid_Detection import cuboid_candidates  # Import detected cuboid candidates
 
 def compute_face_area(face):
     """Compute the area of a quadrilateral face."""
@@ -28,13 +28,18 @@ def classify_faces(cuboid_faces):
 
     # Determine the square based on aspect ratio closest to 1
     face_data.sort(key=lambda x: (abs(x[2] - 1), x[1]))  # Prioritize aspect ratio, then area
-
-    classified_faces = {
-        "Square": face_data[0][0],
-        "Rectangle 1": face_data[1][0],
-        "Rectangle 2": face_data[2][0]
-    }
-
+    if len(face_data) == 3:
+        classified_faces = {
+            "Square": face_data[0][0],
+            "Rectangle 1": face_data[1][0],
+            "Rectangle 2": face_data[2][0]
+        }
+    elif len(face_data) == 2:
+        classified_faces = {
+            "Square": face_data[0][0],
+            "Rectangle 1": face_data[1][0],
+        }
+    print(f"classified_faces is {classified_faces}")
     return classified_faces
 
 def plot_classified_faces(classified_faces):
@@ -64,13 +69,3 @@ def plot_classified_faces(classified_faces):
     plt.show()
 
 # -------------------- Main Execution --------------------
-
-if cuboid_candidates:
-    for cuboid in cuboid_candidates:
-        classified_faces = classify_faces(cuboid["faces"])
-        print("Face areas and aspect ratios:")
-        for face_label, face in classified_faces.items():
-            print(f"{face_label}: Area = {compute_face_area(face):.2f}, Aspect Ratio = {compute_aspect_ratio(face):.2f}")
-        plot_classified_faces(classified_faces)
-else:
-    print("No valid cuboid detected.")

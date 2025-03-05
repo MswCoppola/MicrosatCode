@@ -16,9 +16,6 @@ class Satellite:
         self.rel_pos = []                                       # for maintaining relative positions to the robot after ranging
         self.corner_lib = {}                                    # for maintaining the position of corners at any instance
 
-    def image_extractor(self, unkown):  # ####################################### Can be used to take a snapshot
-        return
-
     def rotation_axis_determination(self, all_corners):   # ####################################### Can be used to link corners across multiple image
         matched_corner_lists = CornerGrouping.match_vertices_series(all_corners,2)
         print(matched_corner_lists[0])
@@ -43,16 +40,17 @@ class Satellite:
         self.rot_ax = rot_ax[0]
         return rot_ax[1]
 
-    def face_saving(self, pntl):   # ####################################### Gregs code for determining faces
+    def ranging(self, pntl):   # ####################################### Gregs code for determining faces
         valid_quads = dp.generate_quadrilaterals(pntl)
         if len(pntl) == 7:
             cuboid_candidates = dp.identify_cuboids_from_faces(valid_quads, pntl)
-            Distance = dp.Camera_Distance_Estimation(pntl)
+            Distance = dp.Camera_Distance_Estimation(pntl, cuboid_candidates)
             return Distance
         elif len(pntl) == 6:
-            desired_comb = dp.plot_shared_edge_combination(valid_quads)
+            desired_comb = dp.plot_shared_edge_combinations(valid_quads)
             coboid_candidates = dp.filter_final_combination(desired_comb)
-            Distance = dp.Camera_distance_estimation_two(pntl, cuboid_candidates)
+            print(f"coboid_candidates are {coboid_candidates}")
+            Distance = dp.Camera_Distance_Estimation_Two(pntl, coboid_candidates)
             return Distance
         else:
             return None
@@ -67,7 +65,7 @@ class Satellite:
         # imcol_2 = cv2.filter2D(image_resized, -1, kernel)     # Currently not in use, sharpens the image (leads to noise)
 
         mask, processed_image = dp.background_remover(img, rect)
-        image_processed = dp.canny_edge_detector(processed_image, 100, 800, False)      # Input=(colour image, corner sensitivity 1, corner sensitivity 2)
+        image_processed = dp.canny_edge_detector(processed_image, 200, 1000, False)      # Input=(colour image, corner sensitivity 1, corner sensitivity 2)
         print(image_processed)
         edge_col = cv2.cvtColor(image_processed, cv2.COLOR_GRAY2BGR)
 

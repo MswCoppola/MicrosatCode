@@ -14,32 +14,17 @@ from scipy.optimize import linear_sum_assignment
 
 def canny_edge_detector(img, can1, can2, double =False): #can1,  can2 are the hysteria thresholds
     img_f = img.astype(np.uint8)
-    print('calling canny edge')
     im_gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    plt.plot(), plt.imshow(img_f), plt.title('image for canny detection')
-    plt.show()
     img_canny = cv2.Canny(img_f, can1, can2, 7)   # creating the canny edge image for processing
-    kernel = np.ones((3, 3))
-    print('processed completed')# defining kernel for dilation and erosion
+    kernel = np.ones((3, 3)) # defining kernel for dilation and erosion
     img_dilate = cv2.dilate(img_canny, kernel, iterations=1)
     corners = cv2.cornerHarris(im_gr,3,3,0.2)
 
     b = np.argwhere(corners >= 0.5 * corners.max())  # finding the maximum corners (doesn't fully work, only in specific situations)
 
     """ Debuging images"""
-    plt.plot(), plt.imshow(img), plt.title('image for mapping')
-    plt.show()
     plt.plot(), plt.imshow(img_canny), plt.title(f'canny image for double is {double}')
     plt.show()
-    plt.plot(), plt.imshow(corners), plt.title('corner weights')
-    plt.show()
-
-    """ Debugging for large corners"""
-    print(f"b = {b}")
-    print(f"b-1 = {b[:,::-1]}")
-    print(f"corners = {corners}")
-    print(f"corner shape = {corners.shape}")
-    print(f"max corner = {corners[b[:,::-1]]}")
 
     inverted_mask = cv2.bitwise_not(img_dilate)     # Invert the edge intensity to accomodate removal of edges from the image in later stage
     return inverted_mask
@@ -369,17 +354,17 @@ os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
 # Constants
-PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel (comment: Adjusted pixel size assumption)
+PIXEL_SIZE_CM = 0.08 # 8 microns per pixel (comment: Adjusted pixel size assumption)
 FOCAL_LENGTH_CM = 0.5  # Camera focal length in cm
 REAL_SHORT_CM = 3      # Real short edge length in cm
-REAL_LONG_CM = 9       # Real long edge length in cm
+REAL_LONG_CM = 20       # Real long edge length in cm
 EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM
 
 
 def calculate_center_of_mass(corner_points):
     """Calculate the center of mass of the cuboid in meters, assuming uniform density."""
     corner_points = np.array(corner_points)
-    center_of_mass_xy = np.mean(corner_points, axis=0) * (PIXEL_SIZE_CM / 100)  # Convert cm to meters
+    center_of_mass_xy = np.mean(corner_points, axis=0) * (PIXEL_SIZE_CM/100)  # Convert cm to meters
     return center_of_mass_xy
 
 
@@ -444,7 +429,7 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
     plt.show()
 
 
-def Camera_Distance_Estimation(pntlst):
+def Camera_Distance_Estimation(pntlst, cuboid_candidates):
     """Estimate camera position vector from cuboid center of mass with X, Y in meters."""
     if cuboid_candidates:
         faces = cuboid_candidates[0]["faces"]
@@ -607,7 +592,7 @@ def filter_final_combination(filtered_combinations):
 
         saved_final_two_face_cuboid = fig  # Save the final two-face cuboid plot figure
         plt.show()
-        return saved_final_two_face_cuboid
+        return filtered_combinations[0]
     else:
         print("No valid cuboid representation found after final filtering.")
 
@@ -727,7 +712,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
 # Constants
-PIXEL_SIZE_CM = 0.0155  # 8 microns per pixel
+PIXEL_SIZE_CM = 0.000295  # conversion factor pixel to 3D space
 FOCAL_LENGTH_CM = 0.5   # Camera focal length in cm
 REAL_SHORT_CM = 3       # Real short edge length in cm
 REAL_LONG_CM = 20        # Real long edge length in cm
@@ -736,7 +721,7 @@ EXPECTED_ASPECT_RATIO = REAL_LONG_CM / REAL_SHORT_CM  # Expected aspect ratio = 
 def calculate_center_of_mass(corner_points):
     """Calculate the center of mass of the cuboid in meters."""
     corner_points = np.array(corner_points)
-    center_of_mass_xy = np.mean(corner_points, axis=0) * (PIXEL_SIZE_CM / 100)
+    center_of_mass_xy = np.mean(corner_points, axis=0) * (PIXEL_SIZE_CM)
     return center_of_mass_xy
 
 def calculate_distance(short_avg, long_avg):
@@ -762,21 +747,21 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot points
-    ax.scatter([center_of_mass[0]], [center_of_mass[1]], [0], c='blue', label='Cuboid Center of Mass')
+    ax.scatter([0], [0], [0], c='blue', label='Cuboid Center of Mass')
     ax.scatter([camera_vector[0]], [camera_vector[1]], [camera_vector[2]], c='red', label='Camera Position')
 
     # Plot vector
-    ax.plot([center_of_mass[0], camera_vector[0]],
-            [center_of_mass[1], camera_vector[1]],
+    ax.plot([0, camera_vector[0]],
+            [0, camera_vector[1]],
             [0, camera_vector[2]],
             c='green', linestyle='--', label=f'Vector to Camera: {camera_vector}')
 
     # Annotations
     ax.text(camera_vector[0], camera_vector[1], camera_vector[2],
-            f"Camera\n({camera_vector[0]:.2e}, {camera_vector[1]:.2e}, {camera_vector[2]:.2f} m)",
+            f"Camera\n({round(camera_vector[0], 3)}, {round(camera_vector[1], 3)}, {camera_vector[2]:.2f} m)",
             color='red')
-    ax.text(center_of_mass[0], center_of_mass[1], 0,
-            f"Center\n({center_of_mass[0]:.2e}, {center_of_mass[1]:.2e}, 0 m)",
+    ax.text(0, 0, 0,
+            f"Center\n({0}, {0}, 0 m)",
             color='blue')
 
     ax.set_xlabel('X (meters)')
@@ -788,12 +773,15 @@ def plot_3d_camera_position(camera_vector, center_of_mass):
 
 def Camera_Distance_Estimation_Two(corn_list, two_cuboid):
     """Estimate camera position vector and plot it in 3D using pre-identified faces."""
-    if two_cuboid and classified_faces:
+    if two_cuboid and classify_faces:
         center_of_mass = calculate_center_of_mass(corn_list)
-        print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}")
+        print(f"📍 Center of Mass (X, Y in meters): {center_of_mass}.")
 
         edges = []
-        for face_label, face in classified_faces.items():
+        clas_face = classify_faces(two_cuboid)
+        for face_label in clas_face:
+            face = clas_face[face_label]
+            print(f"faces for face label {face_label}, are {face}")
             for i in range(len(face)):
                 p1, p2 = np.array(face[i]), np.array(face[(i + 1) % len(face)])
                 edge_length = np.linalg.norm(p2 - p1) * PIXEL_SIZE_CM
