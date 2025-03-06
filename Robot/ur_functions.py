@@ -9,14 +9,7 @@ import subprocess  # For running take_picture.py
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from robotnik_navigation_msgs.msg import MoveAction, MoveGoal
-import cv2
-import numpy as np
-from matplotlib import pyplot as plt
-from VisualDataProcessing import SatelliteDetector as SD
-#from Robot import take_picture as tp
 import os
-from VisualDataProcessing import Corner_grouping as CornerGrouping 
-from VisualDataProcessing import Ellipse_Fitting as EllipseFitting
 import ur_arm_cartesian as arm 
  
 def move_arm_to_position(position):
