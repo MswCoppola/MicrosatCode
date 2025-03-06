@@ -40,14 +40,14 @@ from Robot import ur_functions as ur
 from VisualDataProcessing import SatelliteDetector as SD
 
 # Safety constants
-MAX_SAFE_DISTANCE = 5  # meters
-MIN_SAFE_DISTANCE = 0.3  # meters
+max_safe_distance = 5  # meters
+min_safe_distance = 0.3  # meters
 
 # Declare global action clients
 global arm_client, base_client
 
 # Initialize ROS node
-rospy.init_node("full_mission_script", anonymous=True)
+rospy.init_node("robot_image_integration", anonymous=True)
 
 # Initialize action clients for robot arm and base control
 arm_client = actionlib.SimpleActionClient(
@@ -72,7 +72,7 @@ ur.move_arm_to_position([-1.6573207378387451, -1.275725321178772, 6.294250397331
                         -0.04999335229907231, 1.6000003814697266, -0.7499907652484339])
 
 # Step 2: Capture images for X seconds
-ur.capture_images(duration=7)
+ur.capture_images(duration=10)
 
 # Initialize satellite target with dimensions (WxDxH in mm)
 current_satellite = SD.Satellite((100, 100, 500))
@@ -107,21 +107,22 @@ while it < len(imlst) and rot_det is False:
         all_point_dic[f"img_{it}_corners"] = process
         all_point_lst.append(np.array(process))
         # Calculate distance to target
-        distance = current_satellite.ranging(process)
+        distance_vector = current_satellite.ranging(process)
     except:
         print("Unable to determine corners")
 
 # Step 4: Adjust base position if target is too far (Assuming arm range is max 1 meter)
-if distance > MAX_SAFE_DISTANCE or distance < MIN_SAFE_DISTANCE:
+x,y,z = distance_vector
+if x > max_safe_distance or x < min_safe_distance:
         raise Exception("Initial position outside safe operating range")
 else:
-    if distance[0] > 1:
-        offset = distance -1
-        distance -= offset
+    if x > 1:
+        offset = x -1
+        distance_vector -= offset
         ur.move_base(offset)
 
 # Step 5: Move arm to grasp target
-ur.move_arm_cartesian(distance[0], distance[1], distance[2])
+ur.move_arm_cartesian(x,y,z)
 
 # Mission complete notification
 print("\n Target successfully acquired! Mission complete.")
