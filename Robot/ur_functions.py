@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# make this automated, and get gregs coordinates to input for the arm and base. display all the values rotation rate etc etc
-# main, runs all files of image and robot control in one file.
- 
+# Functions used for the main.py script to control the robot arm and base.
+
+
 import rospy
 import actionlib
 import time
@@ -36,13 +36,13 @@ def move_arm_to_position(position):
     print(f"🚀 Moving arm to position: {position}")
     arm_client.send_goal(goal)
     arm_client.wait_for_result()
-    print("✅ Arm movement complete.\n")
+    print("Arm movement complete.\n")
  
 def move_arm_cartesian(x_move, y_move, z_move):
     try:
         arm.move_arm(x_move, y_move, z_move)
     except ValueError:
-        print("❌ Invalid input. Please provide a valid movement.")
+        print("Invalid input. Please provide a valid movement.")
 
 def move_base(distance_x):
     """
@@ -57,7 +57,7 @@ def move_base(distance_x):
     print(f"🚀 Moving base by {distance_x} meters...")
     base_client.send_goal(goal)
     base_client.wait_for_result()
-    print("✅ Base movement complete.\n")
+    print("Base movement complete.\n")
  
 def capture_images(duration):
     """
@@ -67,4 +67,4 @@ def capture_images(duration):
     process = subprocess.Popen(["python", "/home/robot/catkin_ws/src/microsat_group_1/src/scripts/ur_picture.py"])  # Adjust path if needed
     time.sleep(duration)  # Let the script run for the given time
     process.terminate()  # Stop the process
-    print("✅ Image capture complete.\n")
+    print("Image capture complete.\n")

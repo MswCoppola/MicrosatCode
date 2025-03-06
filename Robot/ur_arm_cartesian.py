@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# Originally implement_IK.py, now ur_arm.py
 # This script estimates joint positions and moves the robot arm in Cartesian space
 # using forward kinematics to determine new joint angles.
 

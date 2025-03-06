@@ -59,10 +59,10 @@ base_client = actionlib.SimpleActionClient(
 )
 
 # Wait for action servers to become available
-print("🟢 Waiting for action servers...")
+print("Waiting for action servers...")
 arm_client.wait_for_server()
 base_client.wait_for_server()
-print("✅ Action servers connected.\n")
+print("Action servers connected.\n")
 
 # Wait for user input to start mission
 input("🔹 Press Enter to start mission...")
@@ -124,4 +124,4 @@ else:
 ur.move_arm_cartesian(distance[0], distance[1], distance[2])
 
 # Mission complete notification
-print("\n🎯 ✅ Target successfully acquired! Mission complete.")
+print("\n Target successfully acquired! Mission complete.")

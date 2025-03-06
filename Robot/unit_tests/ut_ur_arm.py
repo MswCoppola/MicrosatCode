@@ -1,8 +1,6 @@
 import unittest
 import numpy as np
-from ur_arm import reorder_robot_to_fk, reorder_fk_to_robot, move_robot
-
-
+from ur_arm_cartesian import reorder_robot_to_fk, reorder_fk_to_robot, move_arm
 
 class TestUrArm(unittest.TestCase):
 
@@ -22,7 +20,7 @@ class TestUrArm(unittest.TestCase):
         """Test if move_robot estimates new joint positions correctly."""
         x_move, y_move, z_move = 0.1, -0.1, 0.2  # Test movements
         try:
-            move_robot(x_move, y_move, z_move)  # Ensure function runs without errors
+            move_arm(x_move, y_move, z_move)  # Ensure function runs without errors
             success = True
         except Exception as e:
             print(f"Error in move_robot: {e}")

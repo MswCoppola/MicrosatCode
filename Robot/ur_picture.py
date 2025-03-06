@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# takes pictures and saves them to a directory
+# Takes pictures and saves them to a directory
 
 import rospy
 import cv2
