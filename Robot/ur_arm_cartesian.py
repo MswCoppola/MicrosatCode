@@ -6,7 +6,7 @@
 import numpy as np
 import rospy
 import actionlib
-from ur_arm import forward_all
+from Robot.ur_arm_cartesian import forward_all
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from sensor_msgs.msg import JointState
@@ -44,7 +44,7 @@ def get_current_joint_positions():
 
     return latest_joint_positions
 
-def move_robot(x_move, y_move, z_move):
+def move_arm(x_move, y_move, z_move):
     """
     Moves the robot’s wrist in Cartesian space while maintaining orientation.
     - X direction: forward/backward movement (elbow)
@@ -161,13 +161,3 @@ def reorder_fk_to_robot(q):
     :return: Joint positions reordered for execution on the robot.
     """
     return np.array([q[2], q[1], q[0], q[3], q[4], q[5]])
-
-if __name__ == "__main__":
-    """
-    Main execution block: Prompts user for movement commands and moves the robot accordingly.
-    """
-    try:
-        x_move, y_move, z_move = map(float, input("\n🔹 Enter movement in meters (X Y Z): ").split())
-        move_robot(x_move, y_move, z_move)
-    except ValueError:
-        print("❌ Invalid input. Please enter three numbers for X, Y, and Z movement (e.g., '0.05 0.10 0').")
