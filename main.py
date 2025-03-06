@@ -67,7 +67,7 @@ input("🔹 Press Enter to start mission...")
 ur.move_arm_to_position([-1.6573207378387451, -1.275725321178772, 6.29425039733178e-06, 
                         -0.04999335229907231, 1.6000003814697266, -0.7499907652484339])
 
-# Step 2: Capture images for 7 seconds
+# Step 2: Capture images for X seconds
 ur.capture_images(duration=7)
 
 # Initialize satellite target with dimensions (WxDxH in mm)
@@ -107,7 +107,7 @@ while it < len(imlst) and rot_det is False:
     except:
         print("Unable to determine corners")
 
-# Step 4: Adjust base position if target is too far
+# Step 4: Adjust base position if target is too far (Assuming arm range is max 1 meter)
 if distance[0] > 1:
     offset = distance -1
     distance -= offset
