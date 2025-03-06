@@ -49,6 +49,7 @@ while it < len(imlst) and rot_det is False:
         distance = current_satellite.ranging(process)
     except:
         print("Unable to determine corners")
+print(distance)
 
 #current_satellite.rotation_axis_determination(all_point_lst)
 

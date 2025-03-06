@@ -39,6 +39,10 @@ from robotnik_navigation_msgs.msg import MoveAction, MoveGoal
 from Robot import ur_functions as ur
 from VisualDataProcessing import SatelliteDetector as SD
 
+# Safety constants
+MAX_SAFE_DISTANCE = 5  # meters
+MIN_SAFE_DISTANCE = 0.3  # meters
+
 # Declare global action clients
 global arm_client, base_client
 
@@ -108,10 +112,13 @@ while it < len(imlst) and rot_det is False:
         print("Unable to determine corners")
 
 # Step 4: Adjust base position if target is too far (Assuming arm range is max 1 meter)
-if distance[0] > 1:
-    offset = distance -1
-    distance -= offset
-    ur.move_base(offset)
+if distance > MAX_SAFE_DISTANCE or distance < MIN_SAFE_DISTANCE:
+        raise Exception("Initial position outside safe operating range")
+else:
+    if distance[0] > 1:
+        offset = distance -1
+        distance -= offset
+        ur.move_base(offset)
 
 # Step 5: Move arm to grasp target
 ur.move_arm_cartesian(distance[0], distance[1], distance[2])
